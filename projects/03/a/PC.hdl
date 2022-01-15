@@ -17,4 +17,11 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+    DFF(in=reset, out=dreset);
+    DFF(in=load, out=dload);
+    DFF(in=inc, out=dinc);
+    DFF16(in=din, out=dout);
+    Register(in=in, load=load, out=regout);
+    Inc16(in=dout, out=incout);
+    Mux8Way16(e=false, f=false, g=false, h=false, c=regout, d=regout, b=incout, a=dout, sel[2]=dreset, sel[1]=dload, sel[0]=dinc, out=out, out=din); 
 }
