@@ -12,3 +12,50 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
+(LOOP)
+    @24576
+    D=M
+    @BLACK
+    D;JGT
+    @WHITE
+    0;JMP
+(BLACK)
+    @16384
+    D=A
+    @pixels
+    M=D
+    (BLACKLOOP)
+        // Draw pixel[A] black
+        @pixels
+        A=M
+        M=-1
+        // Repeat until finish
+        @pixels
+        M=M+1
+        D=M
+        @24576
+        D=A-D
+        @BLACKLOOP
+        D;JGT
+        @LOOP
+        0;JMP
+(WHITE)
+    @16384
+    D=A
+    @pixels
+    M=D
+    (WHITELOOP)
+        // Draw pixel[A] black
+        @pixels
+        A=M
+        M=0
+        // Repeat until finish
+        @pixels
+        M=M+1
+        D=M
+        @24576
+        D=A-D
+        @WHITELOOP
+        D;JGT
+        @LOOP
+        0;JMP
