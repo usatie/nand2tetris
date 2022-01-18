@@ -13,14 +13,14 @@
 
 // Put your code here.
 (LOOP)
-    @24576
+    @KBD
     D=M
     @BLACK
     D;JGT
     @WHITE
     0;JMP
 (BLACK)
-    @16384
+    @SCREEN
     D=A
     @pixels
     M=D
@@ -33,14 +33,14 @@
         @pixels
         M=M+1
         D=M
-        @24576
+        @KBD
         D=A-D
         @BLACKLOOP
         D;JGT
         @LOOP
         0;JMP
 (WHITE)
-    @16384
+    @SCREEN
     D=A
     @pixels
     M=D
@@ -53,7 +53,7 @@
         @pixels
         M=M+1
         D=M
-        @24576
+        @KBD
         D=A-D
         @WHITELOOP
         D;JGT

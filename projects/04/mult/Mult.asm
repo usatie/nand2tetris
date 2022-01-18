@@ -13,13 +13,13 @@
 // Initialization, sum=0, R2=0
 @sum
 M=0
-@2
+@R2
 M=0
 
 // Loop
 (LOOP)
 // If R1 > 0, Jump to (ADD)
-@1
+@R1
 D=M
 @ADD
 D;JGT
@@ -29,15 +29,15 @@ D;JGT
 
 (ADD)
 // sum = sum+R1, R1= R1-1
-@0
+@R0
 D=M // D = R1
 @sum
 M=M+D // sum = sum + D
 // Set R2=sum
 D=M // D = sum
-@2
+@R2
 M=D
-@1
+@R1
 M=M-1
 // Back to (LOOP)
 @LOOP
