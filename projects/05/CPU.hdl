@@ -40,4 +40,31 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+    // 制御
+    Not(in=instruction[15], out=constload); // A命令
+    Or(a=constload, b=instruction[5], out=aload); // C命令&destA
+    And(a=instruction[15], b=instruction[4], out=dload); // C命令&destD
+    And(a=instruction[15], b=instruction[3], out=writeM); // C命令&destM
+
+    // A Register
+    Mux16(a=aluout, b[0..14]=instruction[0..14], sel=constload, out=ain);
+    ARegister(in=ain, load=aload, out=aout, out[0..14]=addressM); //A-Register
+    
+    // D Register
+    DRegister(in=aluout, load=dload, out=dout); // D-Register
+    
+    // Program Counter
+    PC(in=aout, inc=true, load=pcload, reset=reset, out[0..14]=pc[0..14]); // Program Counter
+    
+    // ALU
+    Mux16(a=aout, b=inM, sel=instruction[12], out=y); // if a-bit==1 then y=M, else y=A
+    ALU(x=dout, y=y, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluout, out=outM, zr=zr, ng=ng);
+
+    // Jump i.e. PC load
+    Not(in=ng, out=gez);
+    Not(in=zr, out=nzr);
+    And(a=gez, b=nzr, out=ps);
+    And16(a[0..2]=instruction[0..2], b[0]=ps, b[1]=zr, b[2]=ng, out[0..2]=jcomp); // (j1&ng), (j2&zr), (j3&ps)
+    Or8Way(in[0..2]=jcomp, out=jump);
+    And(a=instruction[15], b=jump, out=pcload);
 }
