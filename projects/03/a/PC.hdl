@@ -17,6 +17,7 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+    /*
     DFF(in=reset, out=dreset);
     DFF(in=load, out=dload);
     DFF(in=inc, out=dinc);
@@ -24,4 +25,10 @@ CHIP PC {
     Register(in=in, load=load, out=regout);
     Inc16(in=dout, out=incout);
     Mux8Way16(e=false, f=false, g=false, h=false, c=regout, d=regout, b=incout, a=dout, sel[2]=dreset, sel[1]=dload, sel[0]=dinc, out=out, out=din); 
+    */
+    // 藤田のコードを参考にリファクタ
+    Or8Way(in[0]=load, in[1]=inc, in[2]=reset, out=rgload);
+    Register(in=rgin, load=rgload, out=out, out=rgout);
+    Inc16(in=rgout, out=incout);
+    Mux8Way16(e=false, f=false, g=false, h=false, c=in, d=in, b=incout, a=rgout, sel[2]=reset, sel[1]=load, sel[0]=inc, out=rgin);
 }
