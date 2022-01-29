@@ -12,7 +12,7 @@ pub enum HackCommandType {
 pub struct Parser {
     lines: Vec<String>,
     index: usize,
-    current_command: String,
+    pub current_command: String,
 }
 
 impl Parser {
@@ -20,13 +20,16 @@ impl Parser {
         let mut lines = Vec::<String>::new();
         let cursor = io::BufReader::new(&file);
         for line in cursor.lines() {
-            let line_without_whitespace: String = line.unwrap().split_whitespace().collect();
-            if line_without_whitespace.starts_with("//") {
-                continue;
-            } else if line_without_whitespace.is_empty() {
+            let mut line: String = line.unwrap().split_whitespace().collect();
+            if line.contains("//") {
+                let tokens: Vec<&str> = line.split("//").collect();
+                line = tokens[0].to_string();
+            }
+
+            if line.is_empty() {
                 continue;
             } else {
-                lines.push(line_without_whitespace);
+                lines.push(line);
             }
         }
         return Self {
