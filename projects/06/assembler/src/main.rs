@@ -19,15 +19,15 @@ fn main() {
         panic!("assembler requires path as an argument.");
     }
     let mut path = PathBuf::from(args[1].to_string());
+    println!("{}", path.to_string_lossy());
     if !path
         .extension()
         .expect("target file must have extension.")
         .to_string_lossy()
-        .ends_with(".asm")
+        .ends_with("asm")
     {
         panic!("target file's extension must be .asm");
     }
-    println!("{}", path.to_string_lossy());
 
     // Read and assemble .asm file
     let binary: BitVec<u16, Lsb0> = assemble(path.to_str().expect("").to_string());
