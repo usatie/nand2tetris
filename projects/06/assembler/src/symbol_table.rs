@@ -36,13 +36,13 @@ impl SymbolTable {
             .collect(),
         }
     }
-    pub fn add_entry(&mut self, symbol: String, address: u16) {
-        self.table.insert(symbol, address);
+    pub fn add_entry(&mut self, symbol: &String, address: &u16) {
+        self.table.insert(symbol.to_string(), address.to_owned());
     }
-    pub fn contains(&self, symbol: String) -> bool {
+    pub fn contains(&self, symbol: &String) -> bool {
         self.table.contains_key(symbol.as_str())
     }
-    pub fn get_address(&self, symbol: String) -> u16 {
+    pub fn get_address(&self, symbol: &String) -> u16 {
         return self.table[symbol.as_str()];
     }
 }
@@ -58,12 +58,12 @@ mod tests {
         let table: HashMap<String, u16> = HashMap::new();
         let mut symbol_table = SymbolTable { table };
         assert!(!symbol_table.table.contains_key("sum"));
-        symbol_table.add_entry(String::from("sum"), 0);
+        symbol_table.add_entry(&String::from("sum"), &0);
         assert!(symbol_table.table.contains_key("sum"));
         assert_eq!(symbol_table.table["sum"], 0u16);
 
         assert!(!symbol_table.table.contains_key("LUUP"));
-        symbol_table.add_entry(String::from("LUUP"), 1);
+        symbol_table.add_entry(&String::from("LUUP"), &1);
         assert!(symbol_table.table.contains_key("LUUP"));
         assert_eq!(symbol_table.table["LUUP"], 1u16);
     }
@@ -73,20 +73,20 @@ mod tests {
         table.insert(String::from("sum"), 0);
         table.insert(String::from("LUUP"), 1);
         let symbol_table = SymbolTable { table };
-        assert!(symbol_table.contains(String::from("sum")));
-        assert!(symbol_table.contains(String::from("LUUP")));
-        assert!(!symbol_table.contains(String::from("i")));
+        assert!(symbol_table.contains(&String::from("sum")));
+        assert!(symbol_table.contains(&String::from("LUUP")));
+        assert!(!symbol_table.contains(&String::from("i")));
 
         let symbol_table = SymbolTable::new();
-        assert!(symbol_table.contains(String::from("SP")));
-        assert!(symbol_table.contains(String::from("LCL")));
-        assert!(symbol_table.contains(String::from("ARG")));
-        assert!(symbol_table.contains(String::from("THIS")));
-        assert!(symbol_table.contains(String::from("THAT")));
-        assert!(symbol_table.contains(String::from("R0")));
-        assert!(symbol_table.contains(String::from("R15")));
-        assert!(symbol_table.contains(String::from("SCREEN")));
-        assert!(symbol_table.contains(String::from("KBD")));
+        assert!(symbol_table.contains(&String::from("SP")));
+        assert!(symbol_table.contains(&String::from("LCL")));
+        assert!(symbol_table.contains(&String::from("ARG")));
+        assert!(symbol_table.contains(&String::from("THIS")));
+        assert!(symbol_table.contains(&String::from("THAT")));
+        assert!(symbol_table.contains(&String::from("R0")));
+        assert!(symbol_table.contains(&String::from("R15")));
+        assert!(symbol_table.contains(&String::from("SCREEN")));
+        assert!(symbol_table.contains(&String::from("KBD")));
     }
     #[test]
     fn test_get_address() {
@@ -95,19 +95,19 @@ mod tests {
         table.insert(String::from("LUUP"), 1);
         table.insert(String::from("END"), 2);
         let symbol_table = SymbolTable { table };
-        assert_eq!(symbol_table.get_address(String::from("sum")), 0);
-        assert_eq!(symbol_table.get_address(String::from("LUUP")), 1);
-        assert_eq!(symbol_table.get_address(String::from("END")), 2);
+        assert_eq!(symbol_table.get_address(&String::from("sum")), 0);
+        assert_eq!(symbol_table.get_address(&String::from("LUUP")), 1);
+        assert_eq!(symbol_table.get_address(&String::from("END")), 2);
 
         let symbol_table = SymbolTable::new();
-        assert_eq!(symbol_table.get_address(String::from("SP")), 0);
-        assert_eq!(symbol_table.get_address(String::from("LCL")), 1);
-        assert_eq!(symbol_table.get_address(String::from("ARG")), 2);
-        assert_eq!(symbol_table.get_address(String::from("THIS")), 3);
-        assert_eq!(symbol_table.get_address(String::from("THAT")), 4);
-        assert_eq!(symbol_table.get_address(String::from("R0")), 0);
-        assert_eq!(symbol_table.get_address(String::from("R15")), 15);
-        assert_eq!(symbol_table.get_address(String::from("SCREEN")), 16384);
-        assert_eq!(symbol_table.get_address(String::from("KBD")), 24576);
+        assert_eq!(symbol_table.get_address(&String::from("SP")), 0);
+        assert_eq!(symbol_table.get_address(&String::from("LCL")), 1);
+        assert_eq!(symbol_table.get_address(&String::from("ARG")), 2);
+        assert_eq!(symbol_table.get_address(&String::from("THIS")), 3);
+        assert_eq!(symbol_table.get_address(&String::from("THAT")), 4);
+        assert_eq!(symbol_table.get_address(&String::from("R0")), 0);
+        assert_eq!(symbol_table.get_address(&String::from("R15")), 15);
+        assert_eq!(symbol_table.get_address(&String::from("SCREEN")), 16384);
+        assert_eq!(symbol_table.get_address(&String::from("KBD")), 24576);
     }
 }

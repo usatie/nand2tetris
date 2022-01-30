@@ -11,7 +11,7 @@ pub enum HackCommandType {
 }
 pub struct Parser {
     lines: Vec<String>,
-    index: usize,
+    pub index: usize,
     pub current_command: String,
 }
 

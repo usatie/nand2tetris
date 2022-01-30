@@ -15,8 +15,8 @@ diff PongL.hack PongL.cmp
 # With symbol
 cargo run Max.asm
 diff Max.hack Max.cmp
-cargo run Pong.asm
-diff Pong.hack Pong.cmp
 cargo run Rect.asm
 diff Rect.hack Rect.cmp
+cargo run Pong.asm
+diff Pong.hack Pong.cmp
 echo Success
