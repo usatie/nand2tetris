@@ -19,7 +19,7 @@ fn main() {
         panic!("assembler requires path as an argument.");
     }
     let mut path = PathBuf::from(args[1].to_string());
-    println!("{}", path.to_string_lossy());
+    //println!("{}", path.to_string_lossy());
     if !path
         .extension()
         .expect("target file must have extension.")
@@ -75,13 +75,13 @@ fn assemble(path: String) -> BitVec<u16, Lsb0> {
                 orders.append(&mut bits.to_bitvec());
             }
             HackCommandType::L => {
-                println!("L_COMMAND: {}", parser.current_command);
+                //println!("L_COMMAND: {}", parser.current_command);
             }
         }
     }
 
-    for (i, order) in orders.chunks(16).enumerate() {
-        println!("{:10} => {:b}", assemblies[i], order);
-    }
+    //for (i, order) in orders.chunks(16).enumerate() {
+    //    println!("{:10} => {:b}", assemblies[i], order);
+    //}
     return orders;
 }

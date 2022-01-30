@@ -1,0 +1,20 @@
+#!usr/local/bin/zsh
+set -e
+# Without symbol
+cargo run Add.asm
+diff Add.hack Add.cmp
+cargo run MaxL.asm
+diff MaxL.hack MaxL.cmp
+cargo run PongL.asm
+diff PongL.hack PongL.cmp
+cargo run RectL.asm
+diff RectL.hack RectL.cmp
+
+# With symbol
+cargo run Max.asm
+diff Max.hack Max.cmp
+cargo run Pong.asm
+diff Pong.hack Pong.cmp
+cargo run Rect.asm
+diff Rect.hack Rect.cmp
+echo Success
