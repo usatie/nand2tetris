@@ -1,14 +1,16 @@
-#!usr/local/bin/zsh
+#!/usr/local/bin/zsh
+cd "$(dirname "$0")"
+export RUSTFLAGS=-Awarnings
 set -e
 # Without symbol
 cargo run Add.asm
 diff Add.hack Add.cmp
 cargo run MaxL.asm
 diff MaxL.hack MaxL.cmp
-cargo run PongL.asm
-diff PongL.hack PongL.cmp
 cargo run RectL.asm
 diff RectL.hack RectL.cmp
+cargo run PongL.asm
+diff PongL.hack PongL.cmp
 
 # With symbol
 cargo run Max.asm
