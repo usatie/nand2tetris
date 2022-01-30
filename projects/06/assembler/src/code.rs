@@ -28,7 +28,7 @@ pub fn comp(mnemonic: String) -> BitArray {
         "D+M" => bitarr![1, 0, 0, 0, 0, 1, 0],
         "D-M" => bitarr![1, 0, 1, 0, 0, 1, 1],
         "M-D" => bitarr![1, 0, 0, 0, 1, 1, 1],
-        "DM" => bitarr![1, 0, 0, 0, 0, 0, 0],
+        "D&M" => bitarr![1, 0, 0, 0, 0, 0, 0],
         "D|M" => bitarr![1, 0, 1, 0, 1, 0, 1],
         _ => panic!("unexpected mnemonic for code::comp(): {}", mnemonic),
     }
@@ -104,7 +104,7 @@ mod tests {
         assert_eq!(comp(String::from("D+M")), bitarr![1, 0, 0, 0, 0, 1, 0]);
         assert_eq!(comp(String::from("D-M")), bitarr![1, 0, 1, 0, 0, 1, 1]);
         assert_eq!(comp(String::from("M-D")), bitarr![1, 0, 0, 0, 1, 1, 1]);
-        assert_eq!(comp(String::from("DM")), bitarr![1, 0, 0, 0, 0, 0, 0]);
+        assert_eq!(comp(String::from("D&M")), bitarr![1, 0, 0, 0, 0, 0, 0]);
         assert_eq!(comp(String::from("D|M")), bitarr![1, 0, 1, 0, 1, 0, 1]);
     }
 
