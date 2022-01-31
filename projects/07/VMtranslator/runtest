@@ -3,51 +3,51 @@ export RUSTFLAGS=-Awarnings
 set -e
 # SimpleAdd.vm (file_name)
 cargo run StackArithmetic/SimpleAdd/SimpleAdd.vm
-./CPUEmulator StackArithmetic/SimpleAdd/SimpleAdd.tst 
+CPUEmulator StackArithmetic/SimpleAdd/SimpleAdd.tst 
 rm StackArithmetic/SimpleAdd/SimpleAdd.asm
 
 # SimpleAdd (dir_name)
 cargo run StackArithmetic/SimpleAdd
-./CPUEmulator StackArithmetic/SimpleAdd/SimpleAdd.tst 
+CPUEmulator StackArithmetic/SimpleAdd/SimpleAdd.tst 
 rm StackArithmetic/SimpleAdd/*.asm
 
 # StackTest.vm (file_name)
 cargo run StackArithmetic/StackTest/StackTest.vm
-./CPUEmulator StackArithmetic/StackTest/StackTest.tst 
+CPUEmulator StackArithmetic/StackTest/StackTest.tst 
 rm StackArithmetic/StackTest/StackTest.asm
 
 # StackTest (dir_name)
 cargo run StackArithmetic/StackTest
-./CPUEmulator StackArithmetic/StackTest/StackTest.tst 
+CPUEmulator StackArithmetic/StackTest/StackTest.tst 
 rm StackArithmetic/StackTest/*.asm
 
 # BasicTest.vm (file_name)
 cargo run MemoryAccess/BasicTest/BasicTest.vm
-./CPUEmulator MemoryAccess/BasicTest/BasicTest.tst
+CPUEmulator MemoryAccess/BasicTest/BasicTest.tst
 rm MemoryAccess/BasicTest/BasicTest.asm
 
 # BasicTest (dir_name)
 cargo run MemoryAccess/BasicTest
-./CPUEmulator MemoryAccess/BasicTest/BasicTest.tst
+CPUEmulator MemoryAccess/BasicTest/BasicTest.tst
 rm MemoryAccess/BasicTest/*.asm
 
 # PointerTest.vm (file_name)
 cargo run MemoryAccess/PointerTest/PointerTest.vm
-./CPUEmulator MemoryAccess/PointerTest/PointerTest.tst
+CPUEmulator MemoryAccess/PointerTest/PointerTest.tst
 rm MemoryAccess/PointerTest/PointerTest.asm
 
 # PointerTest (dir_name)
 cargo run MemoryAccess/PointerTest
-./CPUEmulator MemoryAccess/PointerTest/PointerTest.tst
+CPUEmulator MemoryAccess/PointerTest/PointerTest.tst
 rm MemoryAccess/PointerTest/*.asm
 
 # StaticTest.vm (file_name)
 cargo run MemoryAccess/StaticTest/StaticTest.vm
-./CPUEmulator MemoryAccess/StaticTest/StaticTest.tst
+CPUEmulator MemoryAccess/StaticTest/StaticTest.tst
 rm MemoryAccess/StaticTest/StaticTest.asm
 
 # StaticTest (dir_name)
 cargo run MemoryAccess/StaticTest
-./CPUEmulator MemoryAccess/StaticTest/StaticTest.tst
+CPUEmulator MemoryAccess/StaticTest/StaticTest.tst
 rm MemoryAccess/StaticTest/*.asm
 echo Success
