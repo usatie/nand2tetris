@@ -4,6 +4,7 @@ use crate::parser::VMCommandType;
 
 pub struct CodeWriter {
     file: File,
+    cnt: u16,
 }
 
 impl CodeWriter {
@@ -17,7 +18,7 @@ impl CodeWriter {
         );
     }
     pub fn new(file: File) -> Self {
-        let mut s = Self { file };
+        let mut s = Self { file, cnt: 0 };
         s.initialize_stack();
         return s;
     }
@@ -26,6 +27,7 @@ impl CodeWriter {
         self.initialize_stack();
     }
     pub fn write_arithmetic(&mut self, command: String) {
+        self.cnt += 1;
         let pop_to_d_asm: &str = "\
                     // pop y -> D\n\
                     @SP\n\
@@ -62,9 +64,63 @@ impl CodeWriter {
                     ";
                 write!(self.file, "{}{}", pop_to_d_asm, asm);
             }
-            "eq" => {}
-            "gt" => {}
-            "lt" => {}
+            "eq" => {
+                let asm: String = format!(
+                    "\
+                    // D = x - D\n\
+                    A=A-1\n\
+                    D=M-D\n\
+                    M=-1\n\
+                    @eq{0}\n\
+                    D;JEQ\n\
+                    @SP\n\
+                    A=M-1\n\
+                    M=0\n\
+                    (eq{0})\n\
+                    ",
+                    self.cnt
+                )
+                .to_string();
+                write!(self.file, "{}{}", pop_to_d_asm, asm);
+            }
+            "gt" => {
+                let asm: String = format!(
+                    "\
+                    // D = x - D\n\
+                    A=A-1\n\
+                    D=M-D\n\
+                    M=-1\n\
+                    @gt{0}\n\
+                    D;JGT\n\
+                    @SP
+                    A=M-1\n\
+                    M=0\n\
+                    (gt{0})\n\
+                    ",
+                    self.cnt
+                )
+                .to_string();
+                write!(self.file, "{}{}", pop_to_d_asm, asm);
+            }
+            "lt" => {
+                let asm: String = format!(
+                    "\
+                    // D = x - D\n\
+                    A=A-1\n\
+                    D=M-D\n\
+                    M=-1\n\
+                    @lt{0}\n\
+                    D;JLT\n\
+                    @SP\n\
+                    A=M-1\n\
+                    M=0\n\
+                    (lt{0})\n\
+                    ",
+                    self.cnt
+                )
+                .to_string();
+                write!(self.file, "{}{}", pop_to_d_asm, asm);
+            }
             "and" => {
                 let asm: &str = "\
                     // push x & D\n\
