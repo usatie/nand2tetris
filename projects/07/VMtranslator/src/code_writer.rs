@@ -185,7 +185,7 @@ impl CodeWriter {
                 }
                 "static" => {
                     self.asm += format!("@{}.{}\n", self.file_name, index).as_str();
-                    self.asm += "D=M\n"; // D = M[@ARG] = argp
+                    self.asm += "D=M\n"; // D = M[@Xxx.index] = staticp_xxx_index
                     self.push_d();
                 }
                 "pointer" => {
@@ -214,7 +214,9 @@ impl CodeWriter {
                     self.asm += "M=D\n";
                 }
                 "static" => {
-                    panic!("TODO");
+                    self.pop_to_d();
+                    self.asm += format!("@{}.{}\n", self.file_name, index).as_str();
+                    self.asm += "M=D\n"; // M[@Xxx.index] = popされた値
                 }
                 "pointer" => {
                     panic!("TODO!");
