@@ -4,27 +4,40 @@ use crate::parser::VMCommandType;
 
 pub struct CodeWriter {
     file: File,
+    asm: String,
     cnt: u16,
 }
 
+// Assembly Parts
 impl CodeWriter {
-    fn initialize_stack(&mut self) {
-        write!(
-            self.file,
-            "@256\n\
-             D=A\n\
-             @SP\n\
-             M=D\n"
-        );
+    fn initialize_asm(&mut self) {
+        self.asm += "@256\n";
+        self.asm += "D=A\n";
+        self.asm += "@SP\n";
+        self.asm += "M=D\n";
     }
+    fn pop_to_d(&mut self) {
+        self.asm += "@SP\n";
+        self.asm += "M=M-1\n";
+        self.asm += "A=M\n";
+        self.asm += "D=M\n";
+        self.asm += "M=0\n";
+    }
+}
+
+impl CodeWriter {
     pub fn new(file: File) -> Self {
-        let mut s = Self { file, cnt: 0 };
-        s.initialize_stack();
-        return s;
+        let mut writer = Self {
+            file,
+            asm: String::new(),
+            cnt: 0,
+        };
+        writer.initialize_asm();
+        return writer;
     }
     pub fn set_file_name(&mut self, file_name: String) {
         self.file = File::create(file_name).expect("Couldn't create a file.");
-        self.initialize_stack();
+        self.initialize_asm();
     }
     pub fn write_arithmetic(&mut self, command: String) {
         self.cnt += 1;
@@ -45,7 +58,8 @@ impl CodeWriter {
                     A=A-1\n\
                     M=M+D\n\
                     ";
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm;
             }
             "sub" => {
                 let asm: &str = "\
@@ -53,7 +67,8 @@ impl CodeWriter {
                     A=A-1\n\
                     M=M-D\n\
                     ";
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm;
             }
             "neg" => {
                 let asm: &str = "\
@@ -62,7 +77,8 @@ impl CodeWriter {
                     @SP
                     M=M+1
                     ";
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm;
             }
             "eq" => {
                 let asm: String = format!(
@@ -81,7 +97,8 @@ impl CodeWriter {
                     self.cnt
                 )
                 .to_string();
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm.as_str();
             }
             "gt" => {
                 let asm: String = format!(
@@ -100,7 +117,8 @@ impl CodeWriter {
                     self.cnt
                 )
                 .to_string();
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm.as_str();
             }
             "lt" => {
                 let asm: String = format!(
@@ -119,7 +137,8 @@ impl CodeWriter {
                     self.cnt
                 )
                 .to_string();
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm.as_str();
             }
             "and" => {
                 let asm: &str = "\
@@ -127,7 +146,8 @@ impl CodeWriter {
                     A=A-1\n\
                     M=M&D\n\
                     ";
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm;
             }
             "or" => {
                 let asm: &str = "\
@@ -135,7 +155,8 @@ impl CodeWriter {
                     A=A-1\n\
                     M=M|D\n\
                     ";
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm;
             }
             "not" => {
                 let asm: &str = "\
@@ -144,7 +165,8 @@ impl CodeWriter {
                     @SP
                     M=M+1
                     ";
-                write!(self.file, "{}{}", pop_to_d_asm, asm);
+                self.asm += pop_to_d_asm;
+                self.asm += asm;
             }
             _ => panic!("Non Arithmetic command is passed"),
         }
@@ -167,7 +189,7 @@ impl CodeWriter {
                     ",
                         index
                     );
-                    write!(self.file, "{}", asm);
+                    self.asm += asm.as_str();
                 }
                 _ => {
                     panic!("TODO")
@@ -179,8 +201,8 @@ impl CodeWriter {
             }
         }
     }
-    pub fn close(&self) {
-        panic!("TODO");
+    pub fn close(&mut self) {
+        write!(self.file, "{}", self.asm).expect("Couldn't write file.");
     }
 }
 
@@ -222,6 +244,7 @@ mod tests {
     }
     #[test]
     fn test_close() {
+        // 何をテストしたらいいかわからん
         assert!(true);
     }
 }

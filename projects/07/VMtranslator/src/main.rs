@@ -13,6 +13,9 @@ fn main() {
     }
     let path = PathBuf::from(args[1].to_string());
     if path.is_dir() {
+        let mut output_file_path = path.to_owned();
+        output_file_path.push(path.file_name().expect("Couln't get file name."));
+        let mut writer = writer(&output_file_path);
         path.read_dir()
             .expect("read_dir call failed")
             .filter_map(Result::ok)
@@ -24,14 +27,16 @@ fn main() {
                 }
             })
             .for_each(|f| {
-                translate(f.path());
+                translate(&mut parser(&f.path()), &mut writer);
             });
     } else {
-        translate(path);
+        let mut writer = writer(&path);
+        let mut parser = parser(&path);
+        translate(&mut parser, &mut writer);
     }
 }
 
-fn translate(path: PathBuf) {
+fn parser(path: &PathBuf) -> Parser {
     if !path
         .extension()
         .expect("target file must have extension.")
@@ -41,12 +46,19 @@ fn translate(path: PathBuf) {
         panic!("target file's extension must be .vm");
     }
     let file = File::open(path.clone()).expect("Couldn't open file.");
-    let mut parser = Parser::new(&file);
-    let mut path = path;
-    path.set_extension("asm");
-    let output_file = File::create(path).expect("Couldn't create file.");
-    let mut writer = CodeWriter::new(output_file);
+    return Parser::new(&file);
+}
 
+fn writer(path: &PathBuf) -> CodeWriter {
+    println!("path: {:?}", path);
+    let mut path = path.to_owned();
+    path.set_extension("asm");
+    println!("path.asm: {:?}", path);
+    let output_file = File::create(path).expect("Couldn't create file.");
+    return CodeWriter::new(output_file);
+}
+
+fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
     while parser.has_more_commands() {
         parser.advance();
         use parser::VMCommandType::*;
@@ -56,4 +68,5 @@ fn translate(path: PathBuf) {
             _ => panic!("TOOD"),
         }
     }
+    writer.close();
 }
