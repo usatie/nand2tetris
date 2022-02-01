@@ -188,9 +188,19 @@ impl CodeWriter {
                     self.asm += "D=M\n"; // D = M[@Xxx.index] = staticp_xxx_index
                     self.push_d();
                 }
-                "pointer" => {
-                    panic!("TODO!");
-                }
+                "pointer" => match index {
+                    0 => {
+                        self.asm += "@THIS\n";
+                        self.asm += "D=M\n";
+                        self.push_d();
+                    }
+                    1 => {
+                        self.asm += "@THAT\n";
+                        self.asm += "D=M\n";
+                        self.push_d();
+                    }
+                    _ => panic!("'pointer' segment can only take 0 or 1 as index"),
+                },
                 _ => {
                     panic!("TODO")
                 }
@@ -218,9 +228,19 @@ impl CodeWriter {
                     self.asm += format!("@{}.{}\n", self.file_name, index).as_str();
                     self.asm += "M=D\n"; // M[@Xxx.index] = popされた値
                 }
-                "pointer" => {
-                    panic!("TODO!");
-                }
+                "pointer" => match index {
+                    0 => {
+                        self.pop_to_d();
+                        self.asm += "@THIS\n";
+                        self.asm += "M=D\n";
+                    }
+                    1 => {
+                        self.pop_to_d();
+                        self.asm += "@THAT\n";
+                        self.asm += "M=D\n";
+                    }
+                    _ => panic!("'pointer' segment can only take 0 or 1 as index"),
+                },
                 _ => {
                     panic!("TODO")
                 }
