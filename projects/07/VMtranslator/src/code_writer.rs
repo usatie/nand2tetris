@@ -6,6 +6,8 @@ pub struct CodeWriter {
     file: File,
     asm: String,
     cnt: u16,
+    file_name: String,
+    function_name: String,
 }
 
 // Assembly Parts
@@ -30,6 +32,8 @@ impl CodeWriter {
         let mut writer = Self {
             file,
             asm: String::new(),
+            file_name: String::new(),
+            function_name: String::new(),
             cnt: 0,
         };
         writer.initialize_asm();
@@ -113,7 +117,42 @@ impl CodeWriter {
             _ => panic!("Non Arithmetic command is passed"),
         }
     }
+    fn push_d(&mut self) {
+        self.asm += "@SP\n"; // A = @SP
+        self.asm += "A=M\n"; // A = M[@SP] = sp
+        self.asm += "M=D\n"; // M[sp] = argp + index
+        self.asm += "@SP\n"; // A = @SP
+        self.asm += "M=M+1\n"; // M[@SP] = sp + 1
+    }
+    fn push_symbol_plus_index(&mut self, symbol: &str, index: u16) {
+        self.asm += format!("{}\n", symbol).as_str(); // A = @ARG
+        self.asm += "D=M\n"; // D = M[@ARG] = argp
+        self.asm += format!("@{}\n", index).as_str(); // A = index
+        self.asm += "A=D+A\n"; // A = argp + index
+        self.asm += "D=M\n"; // D = M[argp + index]
+        self.push_d()
+    }
+    fn pop_symbol_plus_index(&mut self, symbol: &str, index: u16) {
+        // D = argp + index
+        self.asm += format!("{}\n", symbol).as_str(); // A = @ARG
+        self.asm += "D=M\n"; // D = M[@ARG] = argp
+        self.asm += format!("@{}\n", index).as_str(); // A = index
+        self.asm += "D=D+A\n"; // D = argp + index
+
+        // argp + indexを一時的にR13に格納
+        self.asm += "@R13\n"; // A = @R13
+        self.asm += "M=D\n"; // M[@R13] = argp + index
+
+        // Dにpop
+        self.pop_to_d();
+
+        // M[argp+index] = popしてきた値
+        self.asm += "@R13\n"; // A = @R13
+        self.asm += "A=M\n"; // A = M[@R13] (= argp + index)
+        self.asm += "M=D\n"; // M[argp+index] = D (= popしてきた値)
+    }
     pub fn write_push_pop(&mut self, command: VMCommandType, segment: String, index: u16) {
+        self.cnt += 1;
         use VMCommandType::*;
         match command {
             PUSH => match segment.as_str() {
@@ -127,11 +166,63 @@ impl CodeWriter {
                     self.asm += "@SP\n";
                     self.asm += "M=D\n";
                 }
+                "argument" => {
+                    self.push_symbol_plus_index("@ARG", index);
+                }
+                "local" => {
+                    self.push_symbol_plus_index("@LCL", index);
+                }
+                "this" => {
+                    self.push_symbol_plus_index("@THIS", index);
+                }
+                "that" => {
+                    self.push_symbol_plus_index("@THAT", index);
+                }
+                "temp" => {
+                    self.asm += format!("@R{}\n", index + 5).as_str();
+                    self.asm += "D=M\n";
+                    self.push_d();
+                }
+                "static" => {
+                    self.asm += format!("@{}.{}\n", self.file_name, index).as_str();
+                    self.asm += "D=M\n"; // D = M[@ARG] = argp
+                    self.push_d();
+                }
+                "pointer" => {
+                    panic!("TODO!");
+                }
                 _ => {
                     panic!("TODO")
                 }
             },
-            POP => {}
+            POP => match segment.as_str() {
+                "argument" => {
+                    self.pop_symbol_plus_index("@ARG", index);
+                }
+                "local" => {
+                    self.pop_symbol_plus_index("@LCL", index);
+                }
+                "this" => {
+                    self.pop_symbol_plus_index("@THIS", index);
+                }
+                "that" => {
+                    self.pop_symbol_plus_index("@THAT", index);
+                }
+                "temp" => {
+                    self.pop_to_d();
+                    self.asm += format!("@R{}\n", index + 5).as_str();
+                    self.asm += "M=D\n";
+                }
+                "static" => {
+                    panic!("TODO");
+                }
+                "pointer" => {
+                    panic!("TODO!");
+                }
+                _ => {
+                    panic!("TODO")
+                }
+            },
             _ => {
                 panic!("write_push_pop() is only available for PUSH or POP command type.")
             }

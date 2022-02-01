@@ -50,10 +50,8 @@ fn parser(path: &PathBuf) -> Parser {
 }
 
 fn writer(path: &PathBuf) -> CodeWriter {
-    println!("path: {:?}", path);
     let mut path = path.to_owned();
     path.set_extension("asm");
-    println!("path.asm: {:?}", path);
     let output_file = File::create(path).expect("Couldn't create file.");
     return CodeWriter::new(output_file);
 }
@@ -64,8 +62,13 @@ fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
         use parser::VMCommandType::*;
         match parser.command_type() {
             ARITHMETIC => writer.write_arithmetic(parser.current_command.to_string()),
-            PUSH => writer.write_push_pop(parser.command_type(), parser.arg1(), parser.arg2()),
-            _ => panic!("TOOD"),
+            PUSH | POP => {
+                writer.write_push_pop(parser.command_type(), parser.arg1(), parser.arg2())
+            }
+            _ => {
+                println!("{:?}", parser.command_type());
+                panic!("TOOD")
+            }
         }
     }
     writer.close();
