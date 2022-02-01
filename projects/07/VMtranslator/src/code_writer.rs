@@ -41,132 +41,74 @@ impl CodeWriter {
     }
     pub fn write_arithmetic(&mut self, command: String) {
         self.cnt += 1;
-        let pop_to_d_asm: &str = "\
-                    // pop y -> D\n\
-                    @SP\n\
-                    M=M-1\n\
-                    A=M\n\
-                    D=M\n\
-                    // スタックにゴミ残しておいていいのか？\n\
-                    M=0\n\
-                    ";
-
         match command.as_str() {
             "add" => {
-                let asm: &str = "\
-                    // push x + D\n\
-                    A=A-1\n\
-                    M=M+D\n\
-                    ";
-                self.asm += pop_to_d_asm;
-                self.asm += asm;
+                self.pop_to_d();
+                self.asm += "A=A-1\n";
+                self.asm += "M=M+D\n";
             }
             "sub" => {
-                let asm: &str = "\
-                    // push x - D\n\
-                    A=A-1\n\
-                    M=M-D\n\
-                    ";
-                self.asm += pop_to_d_asm;
-                self.asm += asm;
+                self.pop_to_d();
+                self.asm += "A=A-1\n";
+                self.asm += "M=M-D\n";
             }
             "neg" => {
-                let asm: &str = "\
-                    // push -D\n\
-                    M=-D\n\
-                    @SP
-                    M=M+1
-                    ";
-                self.asm += pop_to_d_asm;
-                self.asm += asm;
+                self.pop_to_d();
+                self.asm += "M=-D\n";
+                self.asm += "@SP\n";
+                self.asm += "M=M+1\n";
             }
             "eq" => {
-                let asm: String = format!(
-                    "\
-                    // D = x - D\n\
-                    A=A-1\n\
-                    D=M-D\n\
-                    M=-1\n\
-                    @eq{0}\n\
-                    D;JEQ\n\
-                    @SP\n\
-                    A=M-1\n\
-                    M=0\n\
-                    (eq{0})\n\
-                    ",
-                    self.cnt
-                )
-                .to_string();
-                self.asm += pop_to_d_asm;
-                self.asm += asm.as_str();
+                self.pop_to_d();
+                self.asm += "A=A-1\n";
+                self.asm += "D=M-D\n";
+                self.asm += "M=-1\n";
+                self.asm += format!("@eq{0}\n", self.cnt).as_str();
+                self.asm += "D;JEQ\n";
+                self.asm += "@SP\n";
+                self.asm += "A=M-1\n";
+                self.asm += "M=0\n";
+                self.asm += format!("(eq{0})\n", self.cnt).as_str();
             }
             "gt" => {
-                let asm: String = format!(
-                    "\
-                    // D = x - D\n\
-                    A=A-1\n\
-                    D=M-D\n\
-                    M=-1\n\
-                    @gt{0}\n\
-                    D;JGT\n\
-                    @SP
-                    A=M-1\n\
-                    M=0\n\
-                    (gt{0})\n\
-                    ",
-                    self.cnt
-                )
-                .to_string();
-                self.asm += pop_to_d_asm;
-                self.asm += asm.as_str();
+                self.pop_to_d();
+                self.asm += "A=A-1\n";
+                self.asm += "D=M-D\n";
+                self.asm += "M=-1\n";
+                self.asm += format!("@gt{0}\n", self.cnt).as_str();
+                self.asm += "D;JGT\n";
+                self.asm += "@SP\n";
+                self.asm += "A=M-1\n";
+                self.asm += "M=0\n";
+                self.asm += format!("(gt{0})\n", self.cnt).as_str();
             }
             "lt" => {
-                let asm: String = format!(
-                    "\
-                    // D = x - D\n\
-                    A=A-1\n\
-                    D=M-D\n\
-                    M=-1\n\
-                    @lt{0}\n\
-                    D;JLT\n\
-                    @SP\n\
-                    A=M-1\n\
-                    M=0\n\
-                    (lt{0})\n\
-                    ",
-                    self.cnt
-                )
-                .to_string();
-                self.asm += pop_to_d_asm;
-                self.asm += asm.as_str();
+                self.pop_to_d();
+                self.asm += "A=A-1\n";
+                self.asm += "D=M-D\n";
+                self.asm += "M=-1\n";
+                self.asm += format!("@lt{0}\n", self.cnt).as_str();
+                self.asm += "D;JLT\n";
+                self.asm += "@SP\n";
+                self.asm += "A=M-1\n";
+                self.asm += "M=0\n";
+                self.asm += format!("(lt{0})\n", self.cnt).as_str();
             }
             "and" => {
-                let asm: &str = "\
-                    // push x & D\n\
-                    A=A-1\n\
-                    M=M&D\n\
-                    ";
-                self.asm += pop_to_d_asm;
-                self.asm += asm;
+                self.pop_to_d();
+                self.asm += "A=A-1\n";
+                self.asm += "M=M&D\n";
             }
             "or" => {
-                let asm: &str = "\
-                    // push x & D\n\
-                    A=A-1\n\
-                    M=M|D\n\
-                    ";
-                self.asm += pop_to_d_asm;
-                self.asm += asm;
+                self.pop_to_d();
+                self.asm += "A=A-1\n";
+                self.asm += "M=M|D\n";
             }
             "not" => {
-                let asm: &str = "\
-                    // push !D\n\
-                    M=!D\n\
-                    @SP
-                    M=M+1
-                    ";
-                self.asm += pop_to_d_asm;
-                self.asm += asm;
+                self.pop_to_d();
+                self.asm += "M=!D\n";
+                self.asm += "@SP\n";
+                self.asm += "M=M+1\n";
             }
             _ => panic!("Non Arithmetic command is passed"),
         }
@@ -176,20 +118,14 @@ impl CodeWriter {
         match command {
             PUSH => match segment.as_str() {
                 "constant" => {
-                    let asm: String = format!(
-                        "\
-                    @{}\n\
-                    D=A\n\
-                    @SP\n\
-                    A=M\n\
-                    M=D\n\
-                    D=A+1\n\
-                    @SP\n\
-                    M=D\n\
-                    ",
-                        index
-                    );
-                    self.asm += asm.as_str();
+                    self.asm += format!("@{}\n", index).as_str();
+                    self.asm += "D=A\n";
+                    self.asm += "@SP\n";
+                    self.asm += "A=M\n";
+                    self.asm += "M=D\n";
+                    self.asm += "D=A+1\n";
+                    self.asm += "@SP\n";
+                    self.asm += "M=D\n";
                 }
                 _ => {
                     panic!("TODO")
