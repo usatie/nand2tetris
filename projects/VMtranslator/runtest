@@ -1,6 +1,8 @@
 #!/usr/local/bin/zsh
 export RUSTFLAGS=-Awarnings
 set -e
+cargo test
+
 # SimpleAdd.vm (file_name)
 cargo run StackArithmetic/SimpleAdd/SimpleAdd.vm
 CPUEmulator StackArithmetic/SimpleAdd/SimpleAdd.tst 

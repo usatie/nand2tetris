@@ -255,6 +255,34 @@ impl CodeWriter {
     }
 }
 
+impl CodeWriter {
+    pub fn write_init(&mut self) {
+        panic!("TODO");
+    }
+    pub fn write_label(&mut self, label: String) {
+        panic!("TODO");
+    }
+    pub fn write_goto(&mut self, label: String) {
+        panic!("TODO");
+    }
+    pub fn write_if(&mut self, label: String) {
+        panic!("TODO");
+    }
+    pub fn write_call(&mut self, function_name: String, num_args: u16) {
+        panic!("TODO");
+    }
+    pub fn write_return(&mut self) {
+        panic!("TODO");
+    }
+    pub fn write_function(&mut self, function_name: String, num_locals: u16) {
+        panic!("TODO");
+    }
+}
+
+// 全般的に今回は何をテストしたらいいかわからん。
+// ちゃんとテストしようと思ったら生成されたアセンブリコードを実行して、
+// それが要求されるVM命令の結果になっているかどうかを確認しないといけないけど、それは結合テストでやっている
+// ユニットテストではどういうのテストしたらいいんだろうなー。
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -289,6 +317,7 @@ mod tests {
     }
     #[test]
     fn test_write_push_pop() {
+        // 何をテストしたらいいかわからん
         assert!(true);
     }
     #[test]

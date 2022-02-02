@@ -65,9 +65,23 @@ fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
             PUSH | POP => {
                 writer.write_push_pop(parser.command_type(), parser.arg1(), parser.arg2())
             }
-            _ => {
-                println!("{:?}", parser.command_type());
-                panic!("TOOD")
+            LABEL => {
+                writer.write_label(parser.arg1());
+            }
+            GOTO => {
+                writer.write_goto(parser.arg1());
+            }
+            IF => {
+                writer.write_if(parser.arg1());
+            }
+            FUNCTION => {
+                writer.write_function(parser.arg1(), parser.arg2());
+            }
+            CALL => {
+                writer.write_call(parser.arg1(), parser.arg2());
+            }
+            RETURN => {
+                writer.write_return();
             }
         }
     }
