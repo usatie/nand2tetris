@@ -1,56 +1,103 @@
-#!/usr/local/bin/zsh
+##!/usr/local/bin/zsh
 export RUSTFLAGS=-Awarnings
 set -e
 cargo test
 
-# SimpleAdd.vm (file_name)
+# Chapter 7
+## SimpleAdd.vm (file_name)
 cargo run StackArithmetic/SimpleAdd/SimpleAdd.vm
 CPUEmulator StackArithmetic/SimpleAdd/SimpleAdd.tst 
 rm StackArithmetic/SimpleAdd/SimpleAdd.asm
 
-# SimpleAdd (dir_name)
+## SimpleAdd (dir_name)
 cargo run StackArithmetic/SimpleAdd
 CPUEmulator StackArithmetic/SimpleAdd/SimpleAdd.tst 
 rm StackArithmetic/SimpleAdd/*.asm
 
-# StackTest.vm (file_name)
+## StackTest.vm (file_name)
 cargo run StackArithmetic/StackTest/StackTest.vm
 CPUEmulator StackArithmetic/StackTest/StackTest.tst 
 rm StackArithmetic/StackTest/StackTest.asm
 
-# StackTest (dir_name)
+## StackTest (dir_name)
 cargo run StackArithmetic/StackTest
 CPUEmulator StackArithmetic/StackTest/StackTest.tst 
 rm StackArithmetic/StackTest/*.asm
 
-# BasicTest.vm (file_name)
+## BasicTest.vm (file_name)
 cargo run MemoryAccess/BasicTest/BasicTest.vm
 CPUEmulator MemoryAccess/BasicTest/BasicTest.tst
 rm MemoryAccess/BasicTest/BasicTest.asm
 
-# BasicTest (dir_name)
+## BasicTest (dir_name)
 cargo run MemoryAccess/BasicTest
 CPUEmulator MemoryAccess/BasicTest/BasicTest.tst
 rm MemoryAccess/BasicTest/*.asm
 
-# StaticTest.vm (file_name)
+## StaticTest.vm (file_name)
 cargo run MemoryAccess/StaticTest/StaticTest.vm
 CPUEmulator MemoryAccess/StaticTest/StaticTest.tst
 rm MemoryAccess/StaticTest/StaticTest.asm
 
-# StaticTest (dir_name)
+## StaticTest (dir_name)
 cargo run MemoryAccess/StaticTest
 CPUEmulator MemoryAccess/StaticTest/StaticTest.tst
 rm MemoryAccess/StaticTest/*.asm
 
-# PointerTest.vm (file_name)
+## PointerTest.vm (file_name)
 cargo run MemoryAccess/PointerTest/PointerTest.vm
 CPUEmulator MemoryAccess/PointerTest/PointerTest.tst
 rm MemoryAccess/PointerTest/PointerTest.asm
 
-# PointerTest (dir_name)
+## PointerTest (dir_name)
 cargo run MemoryAccess/PointerTest
 CPUEmulator MemoryAccess/PointerTest/PointerTest.tst
 rm MemoryAccess/PointerTest/*.asm
+
+# Chapter 8
+## BasicLoop.vm (file_name)
+cargo run 08/ProgramFlow/BasicLoop/Basicloop.vm
+CPUEmulator 08/ProgramFlow/BasicLoop/BasicLoop.tst
+rm 08/ProgramFlow/BasicLoop/BasicLoop.asm
+
+## BasicLoop (dir_name)
+cargo run 08/ProgramFlow/BasicLoop
+CPUEmulator 08/ProgramFlow/BasicLoop/BasicLoop.tst
+rm 08/ProgramFlow/BasicLoop/BasicLoop/*.asm
+
+## FibonacciSeries.vm (file_name)
+cargo run 08/ProgramFlow/FibonacciSeries/FibonacciSeries.vm
+CPUEmulator 08/ProgramFlow/FibonacciSeries/FibonacciSeries.tst
+rm 08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm
+
+## FibonacciSeries (dir_name)
+cargo run 08/ProgramFlow/FibonacciSeries
+CPUEmulator 08/ProgramFlow/FibonacciSeries/FibonacciSeries.tst
+rm 08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm
+
+## SimpleFunction.vm (file_name)
+cargo run 08/FunctionCalls/SimpleFunction/SimpleFunction.vm
+CPUEmulator 08/FunctionCalls/SimpleFunction/SimpleFunction.tst
+rm 08/FunctionCalls/SimpleFunction/SimpleFunction.asm
+
+## SimpleFunction (dir_name)
+cargo run 08/FunctionCalls/SimpleFunction
+CPUEmulator 08/FunctionCalls/SimpleFunction/SimpleFunction.tst
+rm 08/FunctionCalls/SimpleFunction/*.asm 
+
+## FibonacciElement (dir_name)
+cargo run 08/FunctionCalls/FibonacciElement/
+CPUEmulator 08/FunctionCalls/FibonacciElement/FibonacciElement.tst
+rm 08/FunctionCalls/FibonacciElement/FibonacciElement.asm
+
+## StaticsTest (dir_name)
+cargo run 08/FunctionCalls/StaticsTest 
+CPUEmulator 08/FunctionCalls/StaticsTest/StaticsTest.tst
+rm 08/FunctionCalls/StaticsTest/*.asm 
+
+## NestedCall (dir_name)
+cargo run 08/FunctionCalls/NestedCall
+CPUEmulator 08/FunctionCalls/NestedCall/NestedCall.tst
+rm 08/FunctionCalls/NestedCall/NestedCall.asm 
 
 echo Success
