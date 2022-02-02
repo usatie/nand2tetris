@@ -18,12 +18,46 @@ impl CodeWriter {
         self.asm += "@SP\n";
         self.asm += "M=D\n";
     }
+    fn push_d(&mut self) {
+        self.asm += "@SP\n"; // A = @SP
+        self.asm += "A=M\n"; // A = M[@SP] = sp
+        self.asm += "M=D\n"; // M[sp] = argp + index
+        self.asm += "@SP\n"; // A = @SP
+        self.asm += "M=M+1\n"; // M[@SP] = sp + 1
+    }
     fn pop_to_d(&mut self) {
         self.asm += "@SP\n";
         self.asm += "M=M-1\n";
         self.asm += "A=M\n";
         self.asm += "D=M\n";
         self.asm += "M=0\n";
+    }
+    fn push_symbol_plus_index(&mut self, symbol: &str, index: u16) {
+        self.asm += format!("{}\n", symbol).as_str(); // A = @ARG
+        self.asm += "D=M\n"; // D = M[@ARG] = argp
+        self.asm += format!("@{}\n", index).as_str(); // A = index
+        self.asm += "A=D+A\n"; // A = argp + index
+        self.asm += "D=M\n"; // D = M[argp + index]
+        self.push_d()
+    }
+    fn pop_symbol_plus_index(&mut self, symbol: &str, index: u16) {
+        // D = argp + index
+        self.asm += format!("{}\n", symbol).as_str(); // A = @ARG
+        self.asm += "D=M\n"; // D = M[@ARG] = argp
+        self.asm += format!("@{}\n", index).as_str(); // A = index
+        self.asm += "D=D+A\n"; // D = argp + index
+
+        // argp + indexを一時的にR13に格納
+        self.asm += "@R13\n"; // A = @R13
+        self.asm += "M=D\n"; // M[@R13] = argp + index
+
+        // Dにpop
+        self.pop_to_d();
+
+        // M[argp+index] = popしてきた値
+        self.asm += "@R13\n"; // A = @R13
+        self.asm += "A=M\n"; // A = M[@R13] (= argp + index)
+        self.asm += "M=D\n"; // M[argp+index] = D (= popしてきた値)
     }
 }
 
@@ -116,40 +150,6 @@ impl CodeWriter {
             }
             _ => panic!("Non Arithmetic command is passed"),
         }
-    }
-    fn push_d(&mut self) {
-        self.asm += "@SP\n"; // A = @SP
-        self.asm += "A=M\n"; // A = M[@SP] = sp
-        self.asm += "M=D\n"; // M[sp] = argp + index
-        self.asm += "@SP\n"; // A = @SP
-        self.asm += "M=M+1\n"; // M[@SP] = sp + 1
-    }
-    fn push_symbol_plus_index(&mut self, symbol: &str, index: u16) {
-        self.asm += format!("{}\n", symbol).as_str(); // A = @ARG
-        self.asm += "D=M\n"; // D = M[@ARG] = argp
-        self.asm += format!("@{}\n", index).as_str(); // A = index
-        self.asm += "A=D+A\n"; // A = argp + index
-        self.asm += "D=M\n"; // D = M[argp + index]
-        self.push_d()
-    }
-    fn pop_symbol_plus_index(&mut self, symbol: &str, index: u16) {
-        // D = argp + index
-        self.asm += format!("{}\n", symbol).as_str(); // A = @ARG
-        self.asm += "D=M\n"; // D = M[@ARG] = argp
-        self.asm += format!("@{}\n", index).as_str(); // A = index
-        self.asm += "D=D+A\n"; // D = argp + index
-
-        // argp + indexを一時的にR13に格納
-        self.asm += "@R13\n"; // A = @R13
-        self.asm += "M=D\n"; // M[@R13] = argp + index
-
-        // Dにpop
-        self.pop_to_d();
-
-        // M[argp+index] = popしてきた値
-        self.asm += "@R13\n"; // A = @R13
-        self.asm += "A=M\n"; // A = M[@R13] (= argp + index)
-        self.asm += "M=D\n"; // M[argp+index] = D (= popしてきた値)
     }
     pub fn write_push_pop(&mut self, command: VMCommandType, segment: String, index: u16) {
         self.cnt += 1;
