@@ -1,10 +1,10 @@
-use std::{fs::File, io::Write};
+use std::{fmt::format, fs::File, io::Write};
 
 use crate::parser::VMCommandType;
 
 pub struct CodeWriter {
     file: File,
-    asm: String,
+    pub asm: String,
     cnt: u16,
     file_name: String,
     function_name: String,
@@ -82,7 +82,7 @@ impl CodeWriter {
     }
     pub fn set_file_name(&mut self, file_name: String) {
         self.file = File::create(file_name).expect("Couldn't create a file.");
-        self.write_init();
+        //self.write_init();
     }
     pub fn write_arithmetic(&mut self, command: String) {
         self.cnt += 1;
@@ -227,6 +227,7 @@ impl CodeWriter {
 
 impl CodeWriter {
     pub fn write_init(&mut self) {
+        // @SP=256
         self.asm += "@256\n";
         self.asm += "D=A\n";
         self.asm += "@SP\n";
@@ -248,18 +249,56 @@ impl CodeWriter {
         self.asm += "D;JNE\n";
     }
     pub fn write_call(&mut self, function_name: String, num_args: u16) {
-        panic!("TODO");
+        self.cnt += 1;
+        // push return-address
+        self.asm += format!("@return-address-of-{}\n", self.cnt).as_str();
+        self.asm += "D=A\n";
+        self.push_d();
+        // push LCL
+        self.asm += "@LCL\n";
+        self.asm += "D=M\n";
+        self.push_d();
+        // push ARG
+        self.asm += "@ARG\n";
+        self.asm += "D=M\n";
+        self.push_d();
+        // push THIS
+        self.asm += "@THIS\n";
+        self.asm += "D=M\n";
+        self.push_d();
+        // push THAT
+        self.asm += "@THAT\n";
+        self.asm += "D=M\n";
+        self.push_d();
+        // ARG = SP-n-5
+        self.asm += "@SP\n";
+        self.asm += "D=M\n";
+        self.asm += format!("@{}\n", num_args + 5).as_str();
+        self.asm += "D=D-A\n";
+        self.asm += "@ARG\n";
+        self.asm += "M=D\n";
+        // LCL=SP
+        self.asm += "@SP\n";
+        self.asm += "D=M\n";
+        self.asm += "@LCL\n";
+        self.asm += "M=D\n";
+        // goto f
+        self.asm += format!("@{}\n", function_name).as_str();
+        self.asm += "0;JMP\n";
+        // (return-address)
+        self.asm += format!("(return-address-of-{})\n", self.cnt).as_str();
     }
     pub fn write_return(&mut self) {
-        // M[@R13] = FRAME - 1 = M[@LCL] - 1
+        // M[@R13] = FRAME
         self.asm += "@LCL\n";
         self.asm += "D=M\n";
         self.asm += "@R13\n";
         self.asm += "M=D\n";
 
-        // M[@R14] = RET = *(FRAME-5)
+        // M[@14] = RET = *(FRAME-5)
         self.asm += "@5\n";
-        self.asm += "D=D-A\n";
+        self.asm += "A=D-A\n";
+        self.asm += "D=M\n";
         self.asm += "@R14\n";
         self.asm += "M=D\n";
 
@@ -307,10 +346,8 @@ impl CodeWriter {
         self.asm += "@LCL\n";
         self.asm += "M=D\n";
 
-        // RET = *(FRAME-5)
         // goto RET
-        self.asm += "@R13\n";
-        self.asm += "M=M-1\n";
+        self.asm += "@R14\n";
         self.asm += "A=M\n";
         self.asm += "0;JMP\n";
     }
@@ -318,9 +355,9 @@ impl CodeWriter {
         self.asm += format!("({})\n", function_name).as_str();
         // 何やったらいいんだっけ？
         let mut n = 0;
-        self.asm += "D=0\n";
         while n < num_locals {
             n += 1;
+            self.asm += "D=0\n";
             self.push_d();
         }
     }

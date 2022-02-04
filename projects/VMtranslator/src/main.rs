@@ -1,4 +1,8 @@
-use std::{env::args, fs::File, path::PathBuf};
+use std::{
+    env::args,
+    fs::{DirEntry, File},
+    path::PathBuf,
+};
 
 use code_writer::CodeWriter;
 use parser::Parser;
@@ -16,7 +20,8 @@ fn main() {
         let mut output_file_path = path.to_owned();
         output_file_path.push(path.file_name().expect("Couln't get file name."));
         let mut writer = writer(&output_file_path);
-        path.read_dir()
+        let vm_files: Vec<DirEntry> = path
+            .read_dir()
             .expect("read_dir call failed")
             .filter_map(Result::ok)
             .filter(|f| {
@@ -26,13 +31,20 @@ fn main() {
                     false
                 }
             })
-            .for_each(|f| {
-                translate(&mut parser(&f.path()), &mut writer);
-            });
+            .collect();
+        if vm_files.len() > 1 {
+            writer.write_call("Sys.init".to_string(), 0);
+        }
+
+        vm_files.iter().for_each(|f| {
+            translate(&mut parser(&f.path()), &mut writer);
+        });
+        writer.close();
     } else {
         let mut writer = writer(&path);
         let mut parser = parser(&path);
         translate(&mut parser, &mut writer);
+        writer.close();
     }
 }
 
@@ -57,8 +69,11 @@ fn writer(path: &PathBuf) -> CodeWriter {
 }
 
 fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
+    let mut last_asm: String;
     while parser.has_more_commands() {
+        last_asm = writer.asm.to_owned();
         parser.advance();
+        //println!("{}", parser.current_command);
         use parser::VMCommandType::*;
         match parser.command_type() {
             ARITHMETIC => writer.write_arithmetic(parser.current_command.to_string()),
@@ -84,6 +99,13 @@ fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
                 writer.write_return();
             }
         }
+        let lines1: Vec<&str> = last_asm.split("\n").collect();
+        let lines2: Vec<&str> = writer.asm.split("\n").collect();
+        //println!(
+        //    "[{}~{}]\n{}",
+        //    lines1.len(),
+        //    lines2.len(),
+        //    writer.asm.trim_start_matches(last_asm.as_str())
+        //);
     }
-    writer.close();
 }
