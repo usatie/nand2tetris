@@ -12,12 +12,6 @@ pub struct CodeWriter {
 
 // Assembly Parts
 impl CodeWriter {
-    fn initialize_asm(&mut self) {
-        self.asm += "@256\n";
-        self.asm += "D=A\n";
-        self.asm += "@SP\n";
-        self.asm += "M=D\n";
-    }
     fn push_d(&mut self) {
         self.asm += "@SP\n"; // A = @SP
         self.asm += "A=M\n"; // A = M[@SP] = sp
@@ -83,12 +77,12 @@ impl CodeWriter {
             function_name: String::new(),
             cnt: 0,
         };
-        writer.initialize_asm();
+        writer.write_init();
         return writer;
     }
     pub fn set_file_name(&mut self, file_name: String) {
         self.file = File::create(file_name).expect("Couldn't create a file.");
-        self.initialize_asm();
+        self.write_init();
     }
     pub fn write_arithmetic(&mut self, command: String) {
         self.cnt += 1;
@@ -233,7 +227,10 @@ impl CodeWriter {
 
 impl CodeWriter {
     pub fn write_init(&mut self) {
-        panic!("TODO");
+        self.asm += "@256\n";
+        self.asm += "D=A\n";
+        self.asm += "@SP\n";
+        self.asm += "M=D\n";
     }
     pub fn write_label(&mut self, label: String) {
         panic!("TODO");
