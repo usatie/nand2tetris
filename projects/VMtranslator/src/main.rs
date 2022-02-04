@@ -37,12 +37,27 @@ fn main() {
         }
 
         vm_files.iter().for_each(|f| {
+            writer.set_file_name(
+                f.path()
+                    .file_name()
+                    .expect("Invalid file name")
+                    .to_str()
+                    .expect("")
+                    .to_string(),
+            );
             translate(&mut parser(&f.path()), &mut writer);
         });
         writer.close();
     } else {
         let mut writer = writer(&path);
         let mut parser = parser(&path);
+        writer.set_file_name(
+            path.file_name()
+                .expect("Invalid file name")
+                .to_str()
+                .expect("")
+                .to_string(),
+        );
         translate(&mut parser, &mut writer);
         writer.close();
     }

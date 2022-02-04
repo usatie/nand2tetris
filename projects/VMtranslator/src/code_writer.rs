@@ -81,8 +81,7 @@ impl CodeWriter {
         return writer;
     }
     pub fn set_file_name(&mut self, file_name: String) {
-        self.file = File::create(file_name).expect("Couldn't create a file.");
-        //self.write_init();
+        self.file_name = file_name;
     }
     pub fn write_arithmetic(&mut self, command: String) {
         self.cnt += 1;
