@@ -63,7 +63,7 @@ rm 08/ProgramFlow/BasicLoop/BasicLoop.asm
 ## BasicLoop (dir_name)
 cargo run 08/ProgramFlow/BasicLoop
 CPUEmulator 08/ProgramFlow/BasicLoop/BasicLoop.tst
-rm 08/ProgramFlow/BasicLoop/BasicLoop/*.asm
+rm 08/ProgramFlow/BasicLoop/*.asm
 
 ## FibonacciSeries.vm (file_name)
 cargo run 08/ProgramFlow/FibonacciSeries/FibonacciSeries.vm

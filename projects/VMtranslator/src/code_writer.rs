@@ -233,13 +233,18 @@ impl CodeWriter {
         self.asm += "M=D\n";
     }
     pub fn write_label(&mut self, label: String) {
-        panic!("TODO");
+        // TODO: check label name rule
+        // Available: alphabet, number, under_score, dot, semi colon
+        // The first character should not be a number
+        self.asm += format!("({})\n", label).as_str();
     }
     pub fn write_goto(&mut self, label: String) {
         panic!("TODO");
     }
     pub fn write_if(&mut self, label: String) {
-        panic!("TODO");
+        self.pop_to_d();
+        self.asm += format!("@{}\n", label).as_str();
+        self.asm += "D;JNE\n";
     }
     pub fn write_call(&mut self, function_name: String, num_args: u16) {
         panic!("TODO");
