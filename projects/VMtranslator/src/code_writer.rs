@@ -59,6 +59,19 @@ impl CodeWriter {
         self.asm += "A=M\n"; // A = M[@R13] (= argp + index)
         self.asm += "M=D\n"; // M[argp+index] = D (= popしてきた値)
     }
+
+    fn push_comparison_of_pop_and_d(&mut self, asm_ope: &str) {
+        self.asm += "@SP\n";
+        self.asm += "A=M-1\n";
+        self.asm += "D=M-D\n";
+        self.asm += "M=-1\n";
+        self.asm += format!("@{}{}\n", asm_ope, self.cnt).as_str();
+        self.asm += format!("D;{}\n", asm_ope).as_str();
+        self.asm += "@SP\n";
+        self.asm += "A=M-1\n";
+        self.asm += "M=0\n";
+        self.asm += format!("({}{})\n", asm_ope, self.cnt).as_str();
+    }
 }
 
 impl CodeWriter {
@@ -98,39 +111,15 @@ impl CodeWriter {
             }
             "eq" => {
                 self.pop_to_d();
-                self.asm += "A=A-1\n";
-                self.asm += "D=M-D\n";
-                self.asm += "M=-1\n";
-                self.asm += format!("@eq{0}\n", self.cnt).as_str();
-                self.asm += "D;JEQ\n";
-                self.asm += "@SP\n";
-                self.asm += "A=M-1\n";
-                self.asm += "M=0\n";
-                self.asm += format!("(eq{0})\n", self.cnt).as_str();
+                self.push_comparison_of_pop_and_d("JEQ");
             }
             "gt" => {
                 self.pop_to_d();
-                self.asm += "A=A-1\n";
-                self.asm += "D=M-D\n";
-                self.asm += "M=-1\n";
-                self.asm += format!("@gt{0}\n", self.cnt).as_str();
-                self.asm += "D;JGT\n";
-                self.asm += "@SP\n";
-                self.asm += "A=M-1\n";
-                self.asm += "M=0\n";
-                self.asm += format!("(gt{0})\n", self.cnt).as_str();
+                self.push_comparison_of_pop_and_d("JGT");
             }
             "lt" => {
                 self.pop_to_d();
-                self.asm += "A=A-1\n";
-                self.asm += "D=M-D\n";
-                self.asm += "M=-1\n";
-                self.asm += format!("@lt{0}\n", self.cnt).as_str();
-                self.asm += "D;JLT\n";
-                self.asm += "@SP\n";
-                self.asm += "A=M-1\n";
-                self.asm += "M=0\n";
-                self.asm += format!("(lt{0})\n", self.cnt).as_str();
+                self.push_comparison_of_pop_and_d("JLT");
             }
             "and" => {
                 self.pop_to_d();
@@ -159,25 +148,12 @@ impl CodeWriter {
                 "constant" => {
                     self.asm += format!("@{}\n", index).as_str();
                     self.asm += "D=A\n";
-                    self.asm += "@SP\n";
-                    self.asm += "A=M\n";
-                    self.asm += "M=D\n";
-                    self.asm += "D=A+1\n";
-                    self.asm += "@SP\n";
-                    self.asm += "M=D\n";
+                    self.push_d();
                 }
-                "argument" => {
-                    self.push_symbol_plus_index("@ARG", index);
-                }
-                "local" => {
-                    self.push_symbol_plus_index("@LCL", index);
-                }
-                "this" => {
-                    self.push_symbol_plus_index("@THIS", index);
-                }
-                "that" => {
-                    self.push_symbol_plus_index("@THAT", index);
-                }
+                "argument" => self.push_symbol_plus_index("@ARG", index),
+                "local" => self.push_symbol_plus_index("@LCL", index),
+                "this" => self.push_symbol_plus_index("@THIS", index),
+                "that" => self.push_symbol_plus_index("@THAT", index),
                 "temp" => {
                     self.asm += format!("@R{}\n", index + 5).as_str();
                     self.asm += "D=M\n";
@@ -202,7 +178,7 @@ impl CodeWriter {
                     _ => panic!("'pointer' segment can only take 0 or 1 as index"),
                 },
                 _ => {
-                    panic!("TODO")
+                    panic!("Uexpected segment");
                 }
             },
             POP => match segment.as_str() {
