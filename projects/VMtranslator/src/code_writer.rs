@@ -239,7 +239,8 @@ impl CodeWriter {
         self.asm += format!("({})\n", label).as_str();
     }
     pub fn write_goto(&mut self, label: String) {
-        panic!("TODO");
+        self.asm += format!("@{}\n", label).as_str();
+        self.asm += "0;JMP\n";
     }
     pub fn write_if(&mut self, label: String) {
         self.pop_to_d();
