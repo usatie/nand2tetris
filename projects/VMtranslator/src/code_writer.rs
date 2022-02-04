@@ -251,10 +251,78 @@ impl CodeWriter {
         panic!("TODO");
     }
     pub fn write_return(&mut self) {
-        panic!("TODO");
+        // M[@R13] = FRAME - 1 = M[@LCL] - 1
+        self.asm += "@LCL\n";
+        self.asm += "D=M\n";
+        self.asm += "@R13\n";
+        self.asm += "M=D\n";
+
+        // M[@R14] = RET = *(FRAME-5)
+        self.asm += "@5\n";
+        self.asm += "D=D-A\n";
+        self.asm += "@R14\n";
+        self.asm += "M=D\n";
+
+        // *ARG = pop()
+        self.pop_to_d();
+        self.asm += "@ARG\n";
+        self.asm += "A=M\n";
+        self.asm += "M=D\n";
+
+        // SP = ARG+1
+        self.asm += "@ARG\n";
+        self.asm += "D=M+1\n";
+        self.asm += "@SP\n";
+        self.asm += "M=D\n";
+
+        // THAT = *(FRAME-1))
+        self.asm += "@R13\n";
+        self.asm += "M=M-1\n";
+        self.asm += "A=M\n";
+        self.asm += "D=M\n";
+        self.asm += "@THAT\n";
+        self.asm += "M=D\n";
+
+        // THIS = *(FRAME-2)
+
+        self.asm += "@R13\n";
+        self.asm += "M=M-1\n";
+        self.asm += "A=M\n";
+        self.asm += "D=M\n";
+        self.asm += "@THIS\n";
+        self.asm += "M=D\n";
+        // ARG = *(FRAME-3)
+
+        self.asm += "@R13\n";
+        self.asm += "M=M-1\n";
+        self.asm += "A=M\n";
+        self.asm += "D=M\n";
+        self.asm += "@ARG\n";
+        self.asm += "M=D\n";
+        // LCL = *(FRAME-4)
+        self.asm += "@R13\n";
+        self.asm += "M=M-1\n";
+        self.asm += "A=M\n";
+        self.asm += "D=M\n";
+        self.asm += "@LCL\n";
+        self.asm += "M=D\n";
+
+        // RET = *(FRAME-5)
+        // goto RET
+        self.asm += "@R13\n";
+        self.asm += "M=M-1\n";
+        self.asm += "A=M\n";
+        self.asm += "0;JMP\n";
     }
     pub fn write_function(&mut self, function_name: String, num_locals: u16) {
-        panic!("TODO");
+        self.asm += format!("({})\n", function_name).as_str();
+        // 何やったらいいんだっけ？
+        let mut n = 0;
+        self.asm += "D=0\n";
+        while n < num_locals {
+            n += 1;
+            self.push_d();
+        }
     }
 }
 
