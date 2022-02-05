@@ -16,6 +16,7 @@ pub enum VMCommandType {
     RETURN,
 }
 
+#[derive(Default)]
 pub struct Parser {
     current_command: String,
     index: usize,
@@ -97,6 +98,11 @@ mod tests {
 
     #[test]
     fn test_new() {
+        let parser = Parser::default();
+        assert_eq!(parser.current_command, "");
+        assert_eq!(parser.index, 0);
+        assert_eq!(parser.lines.len(), 0);
+
         let file = File::open("StackArithmetic/SimpleAdd/SimpleAdd.vm").expect("Can't open file!");
         let parser = Parser::new(&file);
         assert_eq!(parser.current_command, "");
