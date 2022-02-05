@@ -1,4 +1,4 @@
-use std::{fmt::format, fs::File, io::Write};
+use std::{fs::File, io::Write};
 
 use crate::parser::VMCommandType;
 
@@ -7,7 +7,6 @@ pub struct CodeWriter {
     pub asm: String,
     cnt: u16,
     file_name: String,
-    function_name: String,
 }
 
 // Assembly Parts
@@ -74,18 +73,17 @@ impl CodeWriter {
             file,
             asm: String::new(),
             file_name: String::new(),
-            function_name: String::new(),
             cnt: 0,
         };
         writer.write_init();
         return writer;
     }
-    pub fn set_file_name(&mut self, file_name: String) {
-        self.file_name = file_name;
+    pub fn set_file_name(&mut self, file_name: &str) {
+        self.file_name = file_name.to_string();
     }
-    pub fn write_arithmetic(&mut self, command: String) {
+    pub fn write_arithmetic(&mut self, command: &str) {
         self.cnt += 1;
-        match command.as_str() {
+        match command {
             "add" => {
                 self.pop_to_d();
                 self.asm += "A=A-1\n";
@@ -133,11 +131,11 @@ impl CodeWriter {
             _ => panic!("Non Arithmetic command is passed"),
         }
     }
-    pub fn write_push_pop(&mut self, command: VMCommandType, segment: String, index: u16) {
+    pub fn write_push_pop(&mut self, command: VMCommandType, segment: &str, index: u16) {
         self.cnt += 1;
         use VMCommandType::*;
         match command {
-            PUSH => match segment.as_str() {
+            PUSH => match segment {
                 "constant" => {
                     self.asm += format!("@{}\n", index).as_str();
                     self.asm += "D=A\n";
@@ -174,7 +172,7 @@ impl CodeWriter {
                     panic!("Uexpected segment");
                 }
             },
-            POP => match segment.as_str() {
+            POP => match segment {
                 "argument" => {
                     self.pop_symbol_plus_index("@ARG", index);
                 }
@@ -232,22 +230,22 @@ impl CodeWriter {
         self.asm += "@SP\n";
         self.asm += "M=D\n";
     }
-    pub fn write_label(&mut self, label: String) {
+    pub fn write_label(&mut self, label: &str) {
         // TODO: check label name rule
         // Available: alphabet, number, under_score, dot, semi colon
         // The first character should not be a number
         self.asm += format!("({})\n", label).as_str();
     }
-    pub fn write_goto(&mut self, label: String) {
+    pub fn write_goto(&mut self, label: &str) {
         self.asm += format!("@{}\n", label).as_str();
         self.asm += "0;JMP\n";
     }
-    pub fn write_if(&mut self, label: String) {
+    pub fn write_if(&mut self, label: &str) {
         self.pop_to_d();
         self.asm += format!("@{}\n", label).as_str();
         self.asm += "D;JNE\n";
     }
-    pub fn write_call(&mut self, function_name: String, num_args: u16) {
+    pub fn write_call(&mut self, function_name: &str, num_args: u16) {
         self.cnt += 1;
         // push return-address
         self.asm += format!("@return-address-of-{}\n", self.cnt).as_str();
@@ -350,7 +348,7 @@ impl CodeWriter {
         self.asm += "A=M\n";
         self.asm += "0;JMP\n";
     }
-    pub fn write_function(&mut self, function_name: String, num_locals: u16) {
+    pub fn write_function(&mut self, function_name: &str, num_locals: u16) {
         self.asm += format!("({})\n", function_name).as_str();
         // 何やったらいいんだっけ？
         let mut n = 0;
@@ -385,18 +383,18 @@ mod tests {
     fn test_write_arithmetic() {
         let file = File::create("test.asm").expect("Couldn't create a file.");
         let mut cw = CodeWriter::new(file);
-        //cw.write_push_pop(VMCommandType::PUSH, "constant".to_string(), 12);
-        //cw.write_push_pop(VMCommandType::PUSH, "constant".to_string(), 8);
+        //cw.write_push_pop(VMCommandType::PUSH, "constant", 12);
+        //cw.write_push_pop(VMCommandType::PUSH, "constant", 8);
         //cw.write_arithmetic("sub".to_string());
         //cw.write_arithmetic("neg".to_string());
-        //cw.write_push_pop(VMCommandType::PUSH, "constant".to_string(), 0x0ff0);
-        //cw.write_push_pop(VMCommandType::PUSH, "constant".to_string(), 0x00ff);
+        //cw.write_push_pop(VMCommandType::PUSH, "constant", 0x0ff0);
+        //cw.write_push_pop(VMCommandType::PUSH, "constant", 0x00ff);
         //cw.write_arithmetic("and".to_string());
-        //cw.write_push_pop(VMCommandType::PUSH, "constant".to_string(), 0x0ff0);
-        //cw.write_push_pop(VMCommandType::PUSH, "constant".to_string(), 0x00ff);
-        //cw.write_arithmetic("or".to_string());
-        cw.write_push_pop(VMCommandType::PUSH, "constant".to_string(), 0x0ff0);
-        cw.write_arithmetic("not".to_string());
+        //cw.write_push_pop(VMCommandType::PUSH, "constant", 0x0ff0);
+        //cw.write_push_pop(VMCommandType::PUSH, "constant", 0x00ff);
+        //cw.write_arithmetic("or");
+        cw.write_push_pop(VMCommandType::PUSH, "constant", 0x0ff0);
+        cw.write_arithmetic("not");
     }
     #[test]
     fn test_write_push_pop() {

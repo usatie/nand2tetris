@@ -33,7 +33,7 @@ fn main() {
             })
             .collect();
         if vm_files.len() > 1 {
-            writer.write_call("Sys.init".to_string(), 0);
+            writer.write_call("Sys.init", 0);
         }
 
         vm_files.iter().for_each(|f| {
@@ -42,8 +42,7 @@ fn main() {
                     .file_name()
                     .expect("Invalid file name")
                     .to_str()
-                    .expect("")
-                    .to_string(),
+                    .expect(""),
             );
             translate(&mut parser(&f.path()), &mut writer);
         });
@@ -55,8 +54,7 @@ fn main() {
             path.file_name()
                 .expect("Invalid file name")
                 .to_str()
-                .expect("")
-                .to_string(),
+                .expect(""),
         );
         translate(&mut parser, &mut writer);
         writer.close();
@@ -86,36 +84,36 @@ fn writer(path: &PathBuf) -> CodeWriter {
 fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
     let mut last_asm: String;
     while parser.has_more_commands() {
-        last_asm = writer.asm.to_owned();
+        last_asm = writer.asm.to_string();
         parser.advance();
         //println!("{}", parser.current_command);
         use parser::VMCommandType::*;
         match parser.command_type() {
-            ARITHMETIC => writer.write_arithmetic(parser.current_command.to_string()),
+            ARITHMETIC => writer.write_arithmetic(&parser.current_command),
             PUSH | POP => {
-                writer.write_push_pop(parser.command_type(), parser.arg1(), parser.arg2())
+                writer.write_push_pop(parser.command_type(), parser.arg1().as_str(), parser.arg2())
             }
             LABEL => {
-                writer.write_label(parser.arg1());
+                writer.write_label(parser.arg1().as_str());
             }
             GOTO => {
-                writer.write_goto(parser.arg1());
+                writer.write_goto(parser.arg1().as_str());
             }
             IF => {
-                writer.write_if(parser.arg1());
+                writer.write_if(parser.arg1().as_str());
             }
             FUNCTION => {
-                writer.write_function(parser.arg1(), parser.arg2());
+                writer.write_function(parser.arg1().as_str(), parser.arg2());
             }
             CALL => {
-                writer.write_call(parser.arg1(), parser.arg2());
+                writer.write_call(parser.arg1().as_str(), parser.arg2());
             }
             RETURN => {
                 writer.write_return();
             }
         }
-        let lines1: Vec<&str> = last_asm.split("\n").collect();
-        let lines2: Vec<&str> = writer.asm.split("\n").collect();
+        //let lines1: Vec<&str> = last_asm.split("\n").collect();
+        //let lines2: Vec<&str> = writer.asm.split("\n").collect();
         //println!(
         //    "[{}~{}]\n{}",
         //    lines1.len(),
