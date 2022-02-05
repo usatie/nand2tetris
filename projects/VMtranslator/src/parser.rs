@@ -17,9 +17,15 @@ pub enum VMCommandType {
 }
 
 pub struct Parser {
-    pub current_command: String,
+    current_command: String,
     index: usize,
     lines: Vec<String>,
+}
+
+impl Parser {
+    pub fn get_current_command(&self) -> &str {
+        &self.current_command
+    }
 }
 
 impl Parser {
@@ -36,7 +42,7 @@ impl Parser {
             }
         }
         Self {
-            current_command: "".to_string(),
+            current_command: String::new(),
             index: 0,
             lines,
         }

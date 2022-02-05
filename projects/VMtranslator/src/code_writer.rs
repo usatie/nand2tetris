@@ -4,9 +4,15 @@ use crate::parser::VMCommandType;
 
 pub struct CodeWriter {
     file: File,
-    pub asm: String,
+    asm: String,
     cnt: u16,
     file_name: String,
+}
+
+impl CodeWriter {
+    pub fn get_asm(&self) -> &str {
+        &self.asm
+    }
 }
 
 // Assembly Parts

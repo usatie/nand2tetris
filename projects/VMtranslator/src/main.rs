@@ -84,12 +84,12 @@ fn writer(path: &PathBuf) -> CodeWriter {
 fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
     let mut last_asm: String;
     while parser.has_more_commands() {
-        last_asm = writer.asm.to_string();
+        last_asm = writer.get_asm().to_string();
         parser.advance();
         //println!("{}", parser.current_command);
         use parser::VMCommandType::*;
         match parser.command_type() {
-            ARITHMETIC => writer.write_arithmetic(&parser.current_command),
+            ARITHMETIC => writer.write_arithmetic(parser.get_current_command()),
             PUSH | POP => {
                 writer.write_push_pop(parser.command_type(), parser.arg1().as_str(), parser.arg2())
             }
@@ -113,7 +113,7 @@ fn translate(parser: &mut Parser, writer: &mut CodeWriter) {
             }
         }
         //let lines1: Vec<&str> = last_asm.split("\n").collect();
-        //let lines2: Vec<&str> = writer.asm.split("\n").collect();
+        //let lines2: Vec<&str> = writer.get_asm().split("\n").collect();
         //println!(
         //    "[{}~{}]\n{}",
         //    lines1.len(),
