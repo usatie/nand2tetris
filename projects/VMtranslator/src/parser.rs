@@ -31,7 +31,7 @@ impl Parser {
 
 impl Parser {
     pub fn new(file: &File) -> Self {
-        let mut lines = Vec::<String>::new();
+        let mut parser = Self::default();
         let cursor = io::BufReader::new(file);
         for line in cursor.lines() {
             let mut line = line.unwrap();
@@ -39,14 +39,10 @@ impl Parser {
             line = tokens[0].to_string();
             let tokens: Vec<&str> = line.split_whitespace().collect();
             if !tokens.is_empty() {
-                lines.push(tokens.join(" "));
+                parser.lines.push(tokens.join(" "));
             }
         }
-        Self {
-            current_command: String::new(),
-            index: 0,
-            lines,
-        }
+        return parser;
     }
     pub fn has_more_commands(&self) -> bool {
         self.index < self.lines.len()
