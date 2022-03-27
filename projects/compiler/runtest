@@ -1,0 +1,10 @@
+##!/usr/local/bin/zsh
+export RUSTFLAGS=-Awarnings
+set -e
+cargo test
+
+# Chapter 10
+## ArrayTest (file_name)
+cargo run tests/ArrayTest/Main.jack
+diff -U 3 tests/ArrayTest/Main.xml comps/ArrayTest/Main.xml 
+rm tests/ArrayTest/Main.xml 

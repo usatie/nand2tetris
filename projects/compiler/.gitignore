@@ -11,4 +11,4 @@ Cargo.lock
 **/*.rs.bk
 
 # compiler output xml files
-*.xml
+tests/*/*.xml
